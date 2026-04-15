@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trash2, Minus, Plus, CreditCard } from 'lucide-react';
+import { Trash2, Minus, Plus, CreditCard, ShoppingCart } from 'lucide-react';
 import { useCart } from '../hooks/useCart.jsx';
 import { userAPI } from '../services/api';
 import clsx from 'clsx';
@@ -22,7 +22,7 @@ const Cart = () => {
       
       const response = await userAPI.createOrder({ items: orderItems });
       clearCart();
-      alert(`Order #${response.data.orderId} placed successfully! Total: $${response.data.totalAmount}`);
+      alert(`Order #${response.orderId} placed successfully! Total: INR ${response.totalAmount}`);
       navigate('/orders');
     } catch (error) {
       alert(error.response?.data?.message || 'Failed to place order');
@@ -60,7 +60,7 @@ const Cart = () => {
                   
                   <div className="flex-1 min-w-0">
                     <h3 className="text-xl font-bold text-gray-900 mb-1">{item.name}</h3>
-                    <p className="text-gray-600 mb-4">${item.price}</p>
+                    <p className="text-gray-600 mb-4">INR {item.price}</p>
                     
                     <div className="flex items-center gap-4">
                       <div className="flex items-center bg-gray-100 rounded-xl p-2">
@@ -92,7 +92,7 @@ const Cart = () => {
                   
                   <div className="text-right flex flex-col items-end flex-shrink-0">
                     <span className="text-2xl font-bold text-food-gold">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      INR {(item.price * item.quantity).toFixed(2)}
                     </span>
                   </div>
                 </div>
@@ -112,7 +112,7 @@ const Cart = () => {
                 </div>
                 <div className="flex justify-between text-2xl font-bold text-gray-900 pt-2 border-t">
                   <span>Total:</span>
-                  <span className="text-food-gold">${total.toFixed(2)}</span>
+                  <span className="text-food-gold">INR {total.toFixed(2)}</span>
                 </div>
               </div>
               
@@ -134,7 +134,7 @@ const Cart = () => {
                 ) : (
                   <>
                     <CreditCard size={24} />
-                    Place Order - ${total.toFixed(2)}
+                    Place Order - INR {total.toFixed(2)}
                   </>
                 )}
               </button>

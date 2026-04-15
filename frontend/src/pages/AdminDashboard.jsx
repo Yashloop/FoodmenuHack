@@ -35,7 +35,7 @@ const AdminDashboard = () => {
   });
 
   const createMenuMutation = useMutation({
-    mutationFn: ({ data }) => adminAPI.createMenuItem(data),
+    mutationFn: adminAPI.createMenuItem,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['restaurantMenu'] });
       setMenuForm({ restaurantId: '', name: '', price: '', isAvailable: true });
@@ -59,7 +59,7 @@ const AdminDashboard = () => {
       restaurantId: parseInt(menuForm.restaurantId), 
       name: menuForm.name, 
       price: parseFloat(menuForm.price),
-      is_available: menuForm.isAvailable 
+      isAvailable: menuForm.isAvailable 
     });
   };
 
@@ -84,7 +84,7 @@ const AdminDashboard = () => {
                 : 'text-gray-600 hover:text-gray-900 hover:shadow-lg'
             )}
           >
-            <Restaurant className="inline-block mr-2" size={24} />
+            <UtensilsCrossed className="inline-block mr-2" size={24} />
             Restaurants
           </button>
           <button

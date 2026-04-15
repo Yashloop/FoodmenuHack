@@ -19,17 +19,17 @@ const MenuItem = ({ item }) => {
         <h3 className="text-xl font-bold text-gray-900 line-clamp-1">{item.name}</h3>
         <p className="text-sm text-gray-600 line-clamp-2">{item.description || 'Delicious food item'}</p>
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold text-food-gold">${item.price}</span>
+          <span className="text-2xl font-bold text-food-gold">INR {item.price}</span>
           <button
             onClick={handleAddToCart}
             className="btn btn-primary flex items-center gap-2 group-hover:bg-primary-700 shadow-lg"
-            disabled={!item.is_available}
+            disabled={!item.isAvailable}
           >
             <Plus size={20} />
-            <span>Add {item.quantity > 0 && `(${item.quantity})`}</span>
+            <span>Add</span>
           </button>
         </div>
-        {!item.is_available && (
+        {!item.isAvailable && (
           <div className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-xs font-medium">
             Currently unavailable
           </div>

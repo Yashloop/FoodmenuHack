@@ -8,6 +8,7 @@ import Orders from './pages/Orders';
 import AdminDashboard from './pages/AdminDashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import RestaurantMenu from './pages/RestaurantMenu';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './hooks/useCart.jsx';
@@ -32,6 +33,7 @@ function App() {
               <Navbar />
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/restaurant/:id" element={<RestaurantMenu />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route 

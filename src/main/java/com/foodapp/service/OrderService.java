@@ -83,6 +83,7 @@ public class OrderService {
         return mapToResponse(savedOrder, orderItems);
     }
 
+    @Transactional
     public List<OrderResponse> getMyOrders(User user) {
         return foodOrderRepository.findByUserOrderByCreatedAtDesc(user).stream()
                 .map(order -> mapToResponse(order, orderItemRepository.findByOrder(order)))

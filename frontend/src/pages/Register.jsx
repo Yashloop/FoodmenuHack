@@ -4,6 +4,7 @@ import { Mail, Lock, User } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { authAPI } from '../services/api';
 import clsx from 'clsx';
+import { toast } from 'sonner';
 
 const Register = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
@@ -15,11 +16,25 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await authAPI.register(formData);
-      login(response.data.token, response.data.role);
-      navigate('/');
-    } catch (error) {
-      alert(error.response?.data?.message || 'Registration failed');
+      await authAPI.register(formData);
+      try {
+        const authResponse = await authAPI.login({
+          email: formData.email,
+          password: formData.password,
+        });
+        login(authResponse.token, authResponse.role);
+        toast.success('Registration successful');
+        navigate(authResponse.role === 'ADMIN' ? '/admin' : '/');
+      } catch (loginError) {
+        toast.success('Registration successful. Please sign in.');
+        navigate('/login');
+      }
+    } catch (registerError) {
+      if (!registerError.response) {
+        toast.error('Backend unavailable. Start backend on port 8080 and verify Aiven credentials.');
+      } else {
+        toast.error(registerError.response?.data?.message || 'Registration failed');
+      }
     } finally {
       setLoading(false);
     }

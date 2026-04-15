@@ -19,11 +19,16 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await authAPI.login(formData);
-      login(response.data.token, response.data.role);
+      login(response.token, response.role);
       toast.success('Welcome back!');
-      navigate(from, { replace: true });
+      const destination = response.role === 'ADMIN' ? '/admin' : from;
+      navigate(destination, { replace: true });
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Login failed');
+      if (!error.response) {
+        toast.error('Backend unavailable. Start backend on port 8080 and verify Aiven credentials.');
+      } else {
+        toast.error(error.response?.data?.message || 'Login failed');
+      }
     } finally {
       setLoading(false);
     }
