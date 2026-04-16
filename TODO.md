@@ -1,40 +1,24 @@
-# Food Ordering App Frontend Implementation TODO
+# Admin Dashboard Edit Functionality TODO
 
-## Plan Breakdown (Approved by user)
+## Plan Steps:
 
-1. **[PARTIAL] Install dependencies & setup Tailwind**  \n   - Configs created (tailwind.config.js, postcss.config.js, index.css updated).  \n   - Manual npm install needed (run commands above).  \n   - api.js created.  \n   - AuthContext & useAuth created.
-   - Install runtime deps: react-router-dom, axios, @tanstack/react-query, lucide-react, clsx, tailwind-merge.  
-   - Install dev deps: tailwindcss, postcss, autoprefixer.  
-   - Create/update tailwind.config.js, postcss.config.js.  
-   - Update src/index.css with Tailwind directives.
+1. ✅ **Understand files and create detailed edit plan** (completed via search_files, read_file)
 
-2. **[PENDING] Create core services & context**  
-   - src/services/api.js (Axios instance, API methods).  
-   - src/context/AuthContext.jsx.  
-   - src/hooks/useAuth.js.
+2. ✅ **Add adminAPI.getMenuItems to frontend/src/services/api.js** (completed)
 
-3. **[PARTIAL] Create shared components**  \n   - Navbar.jsx, ProtectedRoute.jsx, MenuItem.jsx created.
-   - src/components/Navbar.jsx.  
-   - src/components/ProtectedRoute.jsx.  
-   - src/components/MenuItem.jsx.  
-   - Other: Layout, Button, Card, etc. if needed.
+3. ✅ **Update frontend/src/pages/AdminDashboard.jsx** (completed)
+   - Add useQuery for menu items per selected restaurant
+   - Add states: selectedRestaurantId, editingMenuItem 
+   - Add updateMenuItem and deleteMenuItem mutations
+   - Replace dummy Edit button on restaurants with functional: show expandable menu list
+   - In menu list: Edit/Delete buttons per menu item
+   - Inline edit form when editing
 
-4. **[COMPLETE] Create pages**  \n   - Login, Register, Home, Cart, Orders, AdminDashboard.jsx created.
-   - src/pages/Login.jsx.  
-   - src/pages/Register.jsx.  
-   - src/pages/Home.jsx (Restaurants).  
-   - src/pages/Cart.jsx.  
-   - src/pages/Orders.jsx.  
-   - src/pages/AdminDashboard.jsx.
+4. **Test changes** 
+   - Run frontend dev server
+   - Login as admin, create restaurant/menu item
+   - Verify edit/delete works, UI updates
 
-5. **[COMPLETE] Update app shell**  \n   - App.jsx & main.jsx updated with Router, Providers, Routes.
-   - src/App.jsx (Router, Providers, Routes, Navbar).  
-   - src/main.jsx (QueryClientProvider, Devtools).
+5. ✅ **Complete task** (attempt_completion)
 
-6. **[PENDING] Testing & completion**  
-   - Run `npm run dev`.  
-   - Verify structure/routing.  
-   - `attempt_completion`.
-
-**Progress: 5/6 steps complete. Next: Testing & completion.**
-
+**Current Step: 4/5**

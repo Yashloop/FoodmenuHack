@@ -49,7 +49,8 @@ export const adminAPI = {
   deleteRestaurant: (id) => api.delete(`/admin/restaurants/${id}`).then(res => res.data),
   createMenuItem: (data) => api.post('/admin/menu', data).then(res => res.data),
   updateMenuItem: (id, data) => api.put(`/admin/menu/${id}`, data).then(res => res.data),
-  deleteMenuItem: (id) => api.delete(`/admin/menu/${id}`).then(res => res.data),
+deleteMenuItem: (id) => api.delete(`/admin/menu/${id}`).then(res => res.data),
+  getMenuItems: (restaurantId) => api.get(`/restaurants/${restaurantId}/menu`).then(res => res.data),
 };
 
 export default api;

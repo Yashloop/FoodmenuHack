@@ -8,12 +8,21 @@ const AdminDashboard = () => {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('restaurants');
   const [restaurantForm, setRestaurantForm] = useState({ name: '', description: '' });
-  const [menuForm, setMenuForm] = useState({ restaurantId: '', name: '', price: '', isAvailable: true });
+const [menuForm, setMenuForm] = useState({ restaurantId: '', name: '', price: '', isAvailable: true });
+  const [selectedRestaurantId, setSelectedRestaurantId] = useState(null);
+  const [editingMenuItem, setEditingMenuItem] = useState(null);
+  const [editForm, setEditForm] = useState({ name: '', price: '', isAvailable: true });
 
   // Queries
   const { data: restaurants } = useQuery({
     queryKey: ['adminRestaurants'],
     queryFn: userAPI.restaurants,
+  });
+
+  const { data: menuItems } = useQuery({
+    queryKey: ['adminMenu', selectedRestaurantId],
+    queryFn: () => adminAPI.getMenuItems(selectedRestaurantId),
+    enabled: !!selectedRestaurantId,
   });
 
   // Mutations
@@ -42,6 +51,23 @@ const AdminDashboard = () => {
     },
   });
 
+  const updateMenuMutation = useMutation({
+    mutationFn: ({ id, data }) => adminAPI.updateMenuItem(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminMenu', selectedRestaurantId] });
+      queryClient.invalidateQueries({ queryKey: ['restaurantMenu', selectedRestaurantId] });
+      setEditingMenuItem(null);
+      setEditForm({ name: '', price: '', isAvailable: true });
+    },
+  });
+
+  const deleteMenuMutation = useMutation({
+    mutationFn: (id) => adminAPI.deleteMenuItem(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminMenu', selectedRestaurantId] });
+    },
+  });
+
   const handleCreateRestaurant = (e) => {
     e.preventDefault();
     createRestaurantMutation.mutate({ name: restaurantForm.name, description: restaurantForm.description });
@@ -53,7 +79,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleCreateMenu = (e) => {
+const handleCreateMenu = (e) => {
     e.preventDefault();
     createMenuMutation.mutate({ 
       restaurantId: parseInt(menuForm.restaurantId), 
@@ -62,6 +88,38 @@ const AdminDashboard = () => {
       isAvailable: menuForm.isAvailable 
     });
   };
+
+  const handleSelectRestaurant = (id) => {
+    setSelectedRestaurantId(selectedRestaurantId === id ? null : id);
+  };
+
+  const handleEditMenuItem = (item) => {
+    setEditingMenuItem(item);
+    setEditForm({
+      name: item.name,
+      price: item.price,
+      isAvailable: item.isAvailable,
+    });
+  };
+
+  const handleUpdateMenuItem = (e) => {
+    e.preventDefault();
+    updateMenuMutation.mutate({
+      id: editingMenuItem.id,
+      data: {
+        restaurantId: selectedRestaurantId,
+        name: editForm.name,
+        price: parseFloat(editForm.price),
+        isAvailable: editForm.isAvailable,
+      },
+    });
+  };
+
+  const handleDeleteMenuItem = (id) => {
+    if (confirm('Delete this menu item?')) {
+      deleteMenuMutation.mutate(id);
+    }
+  }; 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 py-12">
@@ -153,10 +211,100 @@ const AdminDashboard = () => {
                     <h3 className="text-2xl font-bold text-gray-900">{restaurant.name}</h3>
                     <p className="text-gray-600 line-clamp-3">{restaurant.description}</p>
                     
+                    {selectedRestaurantId === restaurant.id && (
+                      <div>
+                        <h4 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                          <MenuIcon size={20} />
+                          Menu Items
+                        </h4>
+                        <div className="grid grid-cols-1 gap-4 mb-4">
+                          {Array.isArray(menuItems) && menuItems.length > 0 ? menuItems.map((item) => (
+                            <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                              <div>
+                                <div className="font-semibold">{item.name}</div>
+                                <div className="text-sm text-gray-600">${item.price} - {item.isAvailable ? 'Available' : 'Unavailable'}</div>
+                              </div>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => handleEditMenuItem(item)}
+                                  className="btn bg-green-500 hover:bg-green-600 text-white px-3 py-1 text-sm"
+                                >
+                                  <Edit3 size={16} />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteMenuItem(item.id)}
+                                  className="btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 text-sm"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </div>
+                            </div>
+                          )) : (
+                            <p className="text-gray-500 text-center py-4">No menu items yet. Add some from the Menu tab.</p>
+                          )}
+                        </div>
+
+                        {editingMenuItem && editingMenuItem.restaurantId === restaurant.id && (
+                          <div className="p-4 bg-blue-50 rounded-xl border">
+                            <h5 className="font-bold mb-3">Edit Menu Item</h5>
+                            <form onSubmit={handleUpdateMenuItem} className="grid grid-cols-1 gap-3">
+                              <input
+                                type="text"
+                                value={editForm.name}
+                                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                                className="form-input"
+                                placeholder="Item name"
+                              />
+                              <input
+                                type="number"
+                                value={editForm.price}
+                                onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
+                                className="form-input"
+                                placeholder="Price"
+                                step="0.01"
+                                min="0"
+                              />
+                              <label className="flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={editForm.isAvailable}
+                                  onChange={(e) => setEditForm({ ...editForm, isAvailable: e.target.checked })}
+                                  className="w-4 h-4"
+                                />
+                                Available
+                              </label>
+                              <div className="flex gap-2">
+                                <button
+                                  type="submit"
+                                  disabled={updateMenuMutation.isPending}
+                                  className="flex-1 btn bg-indigo-600 hover:bg-indigo-700 text-white"
+                                >
+                                  {updateMenuMutation.isPending ? 'Updating...' : 'Update'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setEditingMenuItem(null);
+                                    setEditForm({ name: '', price: '', isAvailable: true });
+                                  }}
+                                  className="px-4 btn bg-gray-500 hover:bg-gray-600 text-white"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </form>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     <div className="flex gap-3 pt-4">
-                      <button className="flex-1 btn bg-blue-500 hover:bg-blue-600 text-white">
+                      <button 
+                        onClick={() => handleSelectRestaurant(restaurant.id)}
+                        className="flex-1 btn bg-blue-500 hover:bg-blue-600 text-white"
+                      >
                         <Edit3 size={20} className="mr-2" />
-                        Edit
+                        {selectedRestaurantId === restaurant.id ? 'Hide Menu' : 'View/Edit Menu'}
                       </button>
                       <button
                         onClick={() => handleDeleteRestaurant(restaurant.id)}
