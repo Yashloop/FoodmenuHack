@@ -1,11 +1,13 @@
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Search } from 'lucide-react';
+import { useState, useMemo } from 'react';
 import { userAPI } from '../services/api';
 import MenuItem from '../components/MenuItem';
 
 const RestaurantMenu = () => {
   const { id } = useParams();
+  const [searchTerm, setSearchTerm] = useState('');
 
   const { data: restaurants } = useQuery({
     queryKey: ['restaurants'],
@@ -17,6 +19,16 @@ const RestaurantMenu = () => {
     queryFn: () => userAPI.restaurantMenu(id),
     enabled: !!id,
   });
+
+  const filteredMenuItems = useMemo(() => {
+    if (!Array.isArray(menuItems)) return [];
+    if (!searchTerm.trim()) return menuItems;
+    
+    const term = searchTerm.toLowerCase();
+    return menuItems.filter(item => 
+      item.name.toLowerCase().includes(term)
+    );
+  }, [menuItems, searchTerm]);
 
   const restaurant = Array.isArray(restaurants)
     ? restaurants.find((r) => String(r.id) === String(id))
@@ -53,15 +65,33 @@ const RestaurantMenu = () => {
           <p className="text-gray-600 mb-8">{restaurant.description}</p>
         )}
 
-        {Array.isArray(menuItems) && menuItems.length > 0 ? (
+        <div className="mb-8">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search menu items..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="form-input pl-10"
+            />
+          </div>
+          {searchTerm && (
+            <p className="text-sm text-gray-600 mt-2">
+              Found <span className="font-bold">{filteredMenuItems.length}</span> item(s)
+            </p>
+          )}
+        </div>
+
+        {Array.isArray(filteredMenuItems) && filteredMenuItems.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {menuItems.map((item) => (
+            {filteredMenuItems.map((item) => (
               <MenuItem key={item.id} item={item} />
             ))}
           </div>
         ) : (
           <div className="bg-white rounded-2xl p-8 text-center text-gray-600">
-            No menu items available.
+            {searchTerm ? `No menu items found for "${searchTerm}"` : 'No menu items available.'}
           </div>
         )}
       </div>

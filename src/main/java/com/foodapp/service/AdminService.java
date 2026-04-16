@@ -47,6 +47,17 @@ public class AdminService {
     }
 
     @Transactional
+    public RestaurantResponse updateRestaurant(Long id, RestaurantRequest request) {
+        Restaurant restaurant = restaurantRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found"));
+        restaurant.setName(request.name().trim());
+        restaurant.setDescription(request.description());
+        Restaurant saved = restaurantRepository.save(restaurant);
+        log.info("Admin updated restaurant with id {}", id);
+        return mapRestaurant(saved);
+    }
+
+    @Transactional
     public MenuItemResponse addMenuItem(MenuItemRequest request) {
         Restaurant restaurant = restaurantRepository.findById(request.restaurantId())
                 .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found"));

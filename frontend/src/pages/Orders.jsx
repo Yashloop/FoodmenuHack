@@ -1,13 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { userAPI } from '../services/api';
-import { Clock, CheckCircle, XCircle, Package } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Package, AlertCircle } from 'lucide-react';
 import clsx from 'clsx';
 import { toast } from 'sonner';
 
 const Orders = () => {
-  const { data: orders, isLoading, refetch } = useQuery({
+  const { data: orders, isLoading, error, refetch } = useQuery({
     queryKey: ['myOrders'],
     queryFn: userAPI.myOrders,
+    retry: 2,
   });
 
   const getStatusIcon = (status) => {
@@ -49,6 +50,26 @@ const Orders = () => {
     return (
       <div className="min-h-screen bg-gray-50 py-24 flex items-center justify-center">
         <div className="text-lg">Loading your orders...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center py-24 bg-white rounded-3xl shadow-lg">
+            <AlertCircle size={80} className="mx-auto text-red-400 mb-8" />
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Failed to load orders</h3>
+            <p className="text-gray-600 mb-4">{error?.message || 'Please make sure you are logged in'}</p>
+            <button
+              onClick={() => refetch()}
+              className="btn btn-primary px-8 py-4"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
       </div>
     );
   }

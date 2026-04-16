@@ -1,16 +1,25 @@
 import { Plus } from 'lucide-react';
 import clsx from 'clsx';
-import { useCart } from '../hooks/useCart.jsx'; // Will create later
+import { useCart } from '../hooks/useCart.jsx';
 
 const MenuItem = ({ item }) => {
-  const { addToCart } = useCart();
+  const { addToCart, items } = useCart();
+
+  // Find if this item is already in cart
+  const cartItem = items.find(cartItem => cartItem.id === item.id);
+  const cartCount = cartItem ? cartItem.quantity : 0;
 
   const handleAddToCart = () => {
     addToCart(item);
   };
 
   return (
-    <div className="group card hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 overflow-hidden">
+    <div className="group card hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 overflow-hidden relative">
+      {cartCount > 0 && (
+        <div className="absolute top-3 right-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg z-10">
+          In Cart: {cartCount}
+        </div>
+      )}
       <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl mb-4 group-hover:scale-105 transition-transform duration-500 flex items-center justify-center">
         <span className="text-4xl">🍲</span> {/* Replace with real image later */}
       </div>
@@ -18,7 +27,7 @@ const MenuItem = ({ item }) => {
       <div className="space-y-3">
         <h3 className="text-xl font-bold text-gray-900 line-clamp-1">{item.name}</h3>
         <p className="text-sm text-gray-600 line-clamp-2">{item.description || 'Delicious food item'}</p>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between pt-2">
           <span className="text-2xl font-bold text-food-gold">INR {item.price}</span>
           <button
             onClick={handleAddToCart}

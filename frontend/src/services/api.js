@@ -46,6 +46,7 @@ export const userAPI = {
 
 export const adminAPI = {
   createRestaurant: (data) => api.post('/admin/restaurants', data).then(res => res.data),
+  updateRestaurant: (id, data) => api.put(`/admin/restaurants/${id}`, data).then(res => res.data),
   deleteRestaurant: (id) => api.delete(`/admin/restaurants/${id}`).then(res => res.data),
   createMenuItem: (data) => api.post('/admin/menu', data).then(res => res.data),
   updateMenuItem: (id, data) => api.put(`/admin/menu/${id}`, data).then(res => res.data),

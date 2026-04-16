@@ -38,6 +38,11 @@ public class AdminController {
         return ResponseEntity.ok(new ApiResponse("Restaurant deleted"));
     }
 
+    @PutMapping("/restaurants/{id}")
+    public ResponseEntity<RestaurantResponse> updateRestaurant(@PathVariable Long id, @Valid @RequestBody RestaurantRequest request) {
+        return ResponseEntity.ok(adminService.updateRestaurant(id, request));
+    }
+
     @PostMapping("/menu")
     public ResponseEntity<MenuItemResponse> addMenuItem(@Valid @RequestBody MenuItemRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(adminService.addMenuItem(request));
